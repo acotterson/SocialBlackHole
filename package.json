@@ -1,0 +1,36 @@
+{
+  "name": "socialblackhole",
+  "version": "1.0.0",
+  "description": "Social Media Backend API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index",
+    "dev": "nodemon index",
+    "seed": "node utils/seed",
+    "heroku-postbuild": "node utils/seed.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/acotterson/SocialBlackHole.git"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^6.0.13"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.9"
+  },
+  "keywords": [
+    "social",
+    "backend",
+    "API",
+    "mongoose"
+  ],
+  "author": "Alec Otterson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/acotterson/SocialBlackHole/issues"
+  },
+  "homepage": "https://github.com/acotterson/SocialBlackHole#readme"
+}
