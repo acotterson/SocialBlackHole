@@ -4,7 +4,6 @@ const reactionSchema = new Schema({
   reactionID: {
     type: Schema.Types.ObjectId,
     default: new Schema.Types.ObjectId(),
-    ref: "reaction",
   },
   reactionBody: {
     type: String,
@@ -18,16 +17,14 @@ const reactionSchema = new Schema({
   createdAt: {
     type: Date,
     default: Date.now(),
+    get:(timestamp) => dateFormat(timestamp),
   },
 });
 
-reactionSchema.virtual("reactionCount").get(function () {
-  return this.reactions.length;
-});
 
 // reactionSchema.virtual("")
 
-const Reaction = model("reaction", reactionSchema);
+const Reaction = model("Reaction", reactionSchema);
 
 
 module.exports = Reaction;
