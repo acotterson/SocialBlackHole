@@ -1,4 +1,3 @@
-const { ObjectId } = require("mongoose").Types;
 const { User, Thought } = require("../models");
 
 module.exports = {
@@ -40,26 +39,36 @@ module.exports = {
       .then((user) => res.json(user))
       .catch((err) => res.status(500).json(err));
   },
+  // Update a user
+  updateUser(req, res) {
+    Course.findOneAndUpdate(
+      { _id: req.params.userID },
+      { $set: req.body },
+      { runValidators: true, new: true }
+    )
+      .then((user) =>
+        !user
+          ? res.status(404).json({ message: "No user with this id!" })
+          : res.json(user)
+      )
+      .catch((err) => res.status(500).json(err));
+  },
   //   delete a user
   deleteUser(req, res) {
     User.findOneAndRemove({ _id: req.params.userID })
-      .then(
-        (user) =>
-          !user
-            ? res
-                .status(404)
-                .json({ message: "No student with that ID exists." })
-            : res.json({ message: "User successfully deleted." })
-        // Thought.findOneAndRemove(
-        //         { username: req.params.userID },
-        //       )
+      .then((user) =>
+        !user
+          ? res.status(404).json({ message: "No student with that ID exists." })
+          : User.deleteMany({ _id: { $in: User.thoughts } }).then(() =>
+              res.json({ message: "User and thoughts successfully deleted." })
+            )
       )
       .catch((err) => {
         console.log(err);
         res.status(500).json(err);
       });
   },
-  // add a thought to a user
+  // add a friend to a user
   addFriend(req, res) {
     console.log("Your thought is being added");
     console.log(req.body);
@@ -75,11 +84,11 @@ module.exports = {
       )
       .catch((err) => res.status(500).json(err));
   },
-  // remove a thought from a user
+  // remove a friend from a user
   removeFriend(req, res) {
     User.findOneAndUpdate(
       { _id: req.params.userID },
-      { $pull: { friend: { _id: req.params.userID } } },
+      { $pull: { friends: { _id: req.params.userID } } },
       { runValidators: true, new: true }
     )
       .then((user) =>
