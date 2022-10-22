@@ -3,7 +3,7 @@ const { Thought, User } = require("../models");
 const {
   getRandomUsername,
   getRandomReactions,
-  getRandomThoughts,
+  getRandomThought,
   getRandomFriends,
 } = require("./data");
 
@@ -19,14 +19,14 @@ connection.once("open", async () => {
 
   for (let i = 0; i < 20; i++) {
     const thoughts = [];
-    const thoughtText = getRandomThoughts(2);
     const username = getRandomUsername();
-    const friends = getRandomFriends(10);
+    const friends = getRandomFriends(3);
     const email = `${username}@zoomail.com`;
 
     for (let i = 0; i < 2; i++) {
+      const thoughtText = getRandomThought();
       const reactions = getRandomReactions(3);
-      thoughts[i].push({
+      thoughts.push({
         thoughtText,
         username,
         reactions,

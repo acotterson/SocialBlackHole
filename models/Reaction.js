@@ -21,10 +21,4 @@ const reactionSchema = new Schema({
   },
 });
 
-
-// reactionSchema.virtual("")
-
-const Reaction = model("Reaction", reactionSchema);
-
-
-module.exports = Reaction;
+module.exports = reactionSchema;
