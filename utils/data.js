@@ -1,3 +1,5 @@
+const { Types } = require("mongoose");
+
 const names = [
   "Aaran",
   "Aaren",
@@ -25,7 +27,7 @@ const names = [
   "Smith",
   "Jones",
   "Coollastname",
-  "enter_name_here",
+  "Jerrod",
   "Ze",
   "Zechariah",
   "Zeek",
@@ -74,7 +76,7 @@ const names = [
   "Parker",
 ];
 
-const text = [
+const textStrings = [
   "At first I was afraid, I was petrified",
   "Kept thinking I could never live without you by my side",
   "But then I spent so many nights thinking how you did me wrong",
@@ -117,17 +119,18 @@ const getRandomUsername = () =>
   `${getRandomArrItem(names)}${Math.floor(Math.random() * 100000)}`;
 
 // Gets a random thoughts
-const getRandomThought = (int) => {
-  `${getRandomArrItem(text)}`;
-};
+const getRandomThought = () => getRandomArrItem(textStrings);
 
 // Gets random reactions
-const getRandomReactions = (int) => {
+const getRandomReactions = (friends) => {
   const results = [];
-  for (let i = 0; i < int; i++) {
+  for (let i = 0; i < friends.length; i++) {
     results.push({
-      reactionBody: getRandomArrItem(text),
-      username: getRandomUsername(),
+      reactionBody: getRandomArrItem(textStrings),
+      username: friends[i].username,
+      createdAt: Date.now(),
+      _id: new Types.ObjectId(),
+      reactionID: new Types.ObjectId(),
     });
   }
   return results;
@@ -146,4 +149,9 @@ const getRandomFriends = (int) => {
   return results;
 };
 
-module.exports = { getRandomUsername, getRandomReactions, getRandomThought, getRandomFriends };
+module.exports = {
+  getRandomUsername,
+  getRandomReactions,
+  getRandomThought,
+  getRandomFriends,
+};

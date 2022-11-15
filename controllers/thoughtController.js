@@ -4,12 +4,13 @@ module.exports = {
   // get all thoughts
   getThoughts(req, res) {
     Thought.find()
-      .then(async (thoughts) => {
-        const thoughtObj = {
-          thoughts,
-        };
-        return res.json(thoughtObj);
-      })
+      // .populate({
+      //   path: "reactions",
+      //   select: "-__v",
+      // })
+      // .select("-__v")
+      .sort({ _id: -1 })
+      .then((user) => res.json(user))
       .catch((err) => {
         console.log(err);
         return res.status(500).json(err);
@@ -18,12 +19,22 @@ module.exports = {
   //   get one thought
   getSingleThought(req, res) {
     Thought.findOne({ _id: req.params.thoughtID })
-      .select("-__v")
-      .then((thought) =>
+      // .populate({
+      //   path: "reactions",
+      //   select: "-__v",
+      // })
+      // .select("-__v")
+      .then((thought) => {
+        //   if (!thought) {
+        //     res.status(404).json({ message: "No thought with that ID" });
+        //     return;
+        //   }
+        //   res.json(thought);
+        // })
         !thought
           ? res.status(404).json({ message: "No thought with that ID" })
-          : res.json(thought)
-      )
+          : res.json(thought);
+      })
       .catch((err) => {
         console.log(err);
         return res.status(500).json(err);
@@ -32,16 +43,47 @@ module.exports = {
   //   create a thought
   createThought(req, res) {
     Thought.create(req.body)
-      .then((thought) => res.json(thought))
-      .catch((err) => res.status(500).json(err));
+      .then((thought) => {
+        console.log(thought._id);
+        console.log(req.body.userId);
+        return User.findOneAndUpdate(
+          { _id: req.body.userId },
+          { $push: { thoughts: thought._id } },
+          { new: true, runValidators: true }
+        );
+      })
+      .then((user) => {
+        if (!user) {
+          res.status(404).json({ message: "No thought with that ID" });
+          return;
+        }
+        res.json(user);
+      })
+      // res.json(thought))
+      .catch((err) => res.status(500).json(err.message));
   },
-  //   delete a thought
+  // delete a thought
   deleteThought(req, res) {
     Thought.findOneAndDelete({ _id: req.params.thoughtID })
       .then((thought) =>
         !thought
-          ? res.status(404).json({ message: "No student with that ID exists." })
-          : res.json({ message: "Thought successfully deleted." })
+          ? res.status(404).json({ message: "No thought with that ID exists." })
+          : User.findOneAndUpdate(
+              { username: thought.username },
+              { $pull: { thoughts:  req.params.thoughtID } },
+              { new: true }
+            )
+              .then((user) =>
+                !user
+                  ? res.status(404).json({
+                      message:
+                        "Thought deleted, but no user found with that ID :(",
+                    })
+                  : console.log(user)
+              )
+              .then(() =>
+                res.json({ message: "Thought successfully deleted." })
+              )
       )
       .catch((err) => {
         console.log(err);
@@ -50,7 +92,7 @@ module.exports = {
   },
   // Update a thought
   updateThought(req, res) {
-    Course.findOneAndUpdate(
+    Thought.findOneAndUpdate(
       { _id: req.params.thoughtID },
       { $set: req.body },
       { runValidators: true, new: true }
@@ -62,6 +104,7 @@ module.exports = {
       )
       .catch((err) => res.status(500).json(err));
   },
+
   // add a reaction to a thought
   addReaction(req, res) {
     console.log("Your reaction is being added");
@@ -91,9 +134,12 @@ module.exports = {
         !thought
           ? res
               .status(404)
-              .json({ message: "No reaction found with that ID :(" })
+              .json({ message: "No thought with that ID exists." })
           : res.json(thought)
       )
-      .catch((err) => res.status(500).json(err));
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json(err);
+      });
   },
 };
